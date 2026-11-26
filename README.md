@@ -53,6 +53,8 @@ and PHD2 loops the guide camera. Nothing has been tested under the sky.
 - `systemd/`: `pigpiod`, `indiserver`, `xvfb`, `phd2`, `x11vnc`.
 - `config/`: PHD2's equipment profile.
 - `tools/`: scripts that run on the Pi.
+  - `startup.py`: connect every device after a boot and report the rig's
+    state. INDI starts its drivers at boot but leaves devices disconnected.
   - `indi.py`: read and set INDI properties, take frames to a folder.
   - `flats.py`: flats and dark-flats, with the exposure found per filter.
   - `solve.sh`: plate-solve a main-camera frame.
