@@ -1,0 +1,18 @@
+[Unit]
+Description=INDI server for the imaging rig (cameras, filter wheel, mount, 12 V ports)
+After=network.target pigpiod.service
+Wants=pigpiod.service
+
+[Service]
+User=cwage
+# Drivers for gear that is not plugged in just sit idle until it appears.
+# INDI has no authentication: port 7624 is open to the whole LAN.
+ExecStart=/usr/bin/indiserver -v indi_asi_ccd indi_asi_wheel indi_eqmod_telescope indi_asi_power
+Restart=on-failure
+RestartSec=5
+# Shutdown waited about 90 s on 2026-11-23, the default stop timeout, for a
+# service that ignored the stop signal; which one was not established.
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

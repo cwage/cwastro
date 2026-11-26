@@ -1,0 +1,14 @@
+[Unit]
+Description=pigpiod, the GPIO daemon the ASIAIR power-port driver talks to
+
+[Service]
+Type=simple
+# -g foreground, -m no sampling alerts (less CPU), -l listen on localhost only
+ExecStart=/usr/bin/pigpiod -g -m -l
+Restart=on-failure
+# Shutdown waited about 90 s on 2026-11-23, the default stop timeout, for a
+# service that ignored the stop signal; which one was not established.
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
