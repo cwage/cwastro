@@ -1,0 +1,14 @@
+[Unit]
+Description=VNC view of the virtual display, localhost only
+After=xvfb.service
+Requires=xvfb.service
+
+[Service]
+User=cwage
+# Localhost only and no password: reach it through SSH,
+#   ssh -L 5900:localhost:5900 cwage@cwastro   then a VNC viewer on localhost:5900
+ExecStart=/usr/bin/x11vnc -display :99 -localhost -forever -shared -nopw -quiet
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

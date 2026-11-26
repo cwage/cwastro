@@ -1,0 +1,13 @@
+PHD Config 1
+/ConfigVersion	1	2001
+/currentProfile	1	1
+/profile/1/name	1	EQ6-R guide scope
+/profile/1/camera/LastMenuChoice	1	INDI Camera [ZWO CCD ASI120MC-S]
+/profile/1/camera/pixelsize	1	3.75
+/profile/1/camera/binning	1	1
+/profile/1/frame/focalLength	1	162
+/profile/1/indi/INDIhost	1	localhost
+/profile/1/indi/INDIport	1	7624
+/profile/1/indi/INDIcam	1	ZWO CCD ASI120MC-S
+/profile/1/indi/INDImount	1	EQMod Mount
+/profile/1/scope/LastMenuChoice	1	INDI Mount [EQMod Mount]

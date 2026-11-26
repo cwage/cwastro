@@ -1,0 +1,10 @@
+[Unit]
+Description=Virtual display :99 for PHD2 (the box has no monitor)
+
+[Service]
+User=cwage
+ExecStart=/usr/bin/Xvfb :99 -screen 0 1280x800x24 -nolisten tcp
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

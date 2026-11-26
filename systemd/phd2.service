@@ -1,0 +1,16 @@
+[Unit]
+Description=PHD2 guiding, on the virtual display, driven through its server on port 4400
+After=xvfb.service indiserver.service
+Requires=xvfb.service
+Wants=indiserver.service
+
+[Service]
+User=cwage
+Environment=DISPLAY=:99
+ExecStart=/usr/bin/phd2
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
