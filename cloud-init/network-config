@@ -1,0 +1,8 @@
+# Ethernet by DHCP on first boot. Wi-Fi is joined by hand afterwards
+# (sudo nmcli device wifi connect SSID --ask), so no password lives here.
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+      optional: true

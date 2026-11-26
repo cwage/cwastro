@@ -1,0 +1,4 @@
+# cloud-init runs its first-boot setup once per instance_id. Change the id
+# to make it run again on a card that has already booted.
+dsmode: local
+instance_id: cwastro-2

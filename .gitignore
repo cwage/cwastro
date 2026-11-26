@@ -1,0 +1,12 @@
+# Downloaded images, logs and other scratch
+cache/
+__pycache__/
+
+# The real first-boot file holds your SSH public keys; the template is tracked.
+cloud-init/user-data
+
+# Card images and backups never belong here
+*.img
+*.img.gz
+*.img.xz
+backups/

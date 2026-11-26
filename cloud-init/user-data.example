@@ -1,0 +1,75 @@
+#cloud-config
+# First-boot setup for the cwastro box (Raspberry Pi OS Lite, trixie, arm64).
+# Copy this file to cloud-init/user-data (which git ignores), put your SSH
+# public keys in it, and provision/write-bootfs.sh copies it to the card.
+
+hostname: cwastro
+manage_etc_hosts: true
+timezone: America/Chicago
+
+users:
+  - name: cwage
+    gecos: Chris
+    shell: /bin/bash
+    groups: [adm, dialout, plugdev, video, audio, input, render, netdev, gpio, i2c, spi, sudo, users]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      # Your own public key.
+      - ssh-ed25519 AAAA...replace-me you@workstation
+      # Optional: a second, passphrase-less key for unattended scripts, so
+      # they do not depend on an SSH agent holding your key.
+      # - ssh-ed25519 AAAA...replace-me scripts@workstation
+
+# Key login only.
+ssh_pwauth: false
+enable_ssh: true
+
+write_files:
+  # Self-report to the boot partition, readable from any card reader, for
+  # when the box is not reachable over the network.
+  - path: /usr/local/sbin/cwastro-diag
+    permissions: "0755"
+    content: |
+      #!/bin/sh
+      out=/boot/firmware/cwastro-diag.txt
+      {
+        echo "== $(date) up $(cut -d' ' -f1 /proc/uptime)s"
+        echo "== links";      ip -br link
+        echo "== addresses";  ip -br addr
+        echo "== eth0";       ethtool eth0 2>&1 | grep -E "Speed|Duplex|Link detected"
+        echo "== carrier";    cat /sys/class/net/eth0/carrier 2>&1
+        echo "== nm devices"; nmcli -t device 2>&1
+        echo "== nm conns";   nmcli -t -f NAME,TYPE,DEVICE,AUTOCONNECT connection show 2>&1
+        echo "== netplan";    ls -l /etc/netplan /run/NetworkManager/system-connections 2>&1
+        echo "== routes";     ip route
+        echo "== bootloader"; vcgencmd bootloader_version 2>&1 | head -3
+        echo "== kernel net"; dmesg | grep -iE "bcmgenet|eth0|brcmfmac" | tail -20
+        echo "== nm log";     journalctl -b -u NetworkManager --no-pager 2>&1 | tail -40
+      } > "$out.tmp" 2>&1
+      mv "$out.tmp" "$out"
+      sync
+  - path: /etc/systemd/system/cwastro-diag.service
+    content: |
+      [Unit]
+      Description=Write a network self-report to the boot partition
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/cwastro-diag
+  - path: /etc/systemd/system/cwastro-diag.timer
+    content: |
+      [Unit]
+      Description=Network self-report, a minute after boot and every two minutes
+      [Timer]
+      OnBootSec=60
+      OnUnitActiveSec=120
+      [Install]
+      WantedBy=timers.target
+
+runcmd:
+  # Belt and braces: make sure sshd is up whatever the image's default is.
+  - [systemctl, enable, --now, ssh]
+  # The Wi-Fi radio stays blocked until a regulatory country is set.
+  - [raspi-config, nonint, do_wifi_country, US]
+  - [systemctl, daemon-reload]
+  - [systemctl, enable, --now, cwastro-diag.timer]
